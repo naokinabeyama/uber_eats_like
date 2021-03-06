@@ -3,6 +3,26 @@ module Api
     class LineFoodsController < ApplicationController
       before_action :set_food, only: %i[create]
 
+      def index
+        line_foods = LineFood.active # active: trueなline_foodの一覧を取得
+        # linne_foodsのデータがあるか
+        if line_foods.exists?
+          render json: {
+            # line_food.idを一つづつ取得
+            line_food_ids: line_foods.map { |line_food| line_food.id},
+            # 最初の店舗情報（一つの仮注文につき一つの店舗仕様のため）　line_foods.first.restaurantでも可
+            restaurant: line_foods[0].restaurant,
+            # 数量を返す
+            count: line_foods.sum { |line_food| line_food[:count] },
+            # 合計の計算（数量*値段）
+            amount: line_foods.sum { |line_food| line_food.total_amount },
+          }, status: :ok
+        else
+          # line_foodが一つも存在しない場合　リクエストは成功したが、空データ
+          render json: {}, status: :no_content
+        end
+      end
+
       def create
         # 例外パターン
         # 他店舗のline_foodが存在するかexists?で判断している
