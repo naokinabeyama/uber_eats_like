@@ -1,14 +1,14 @@
 module Api
   module V1
     class LineFoodsController < ApplicationController
-      before_action :set_food, only: %i[create]
+      before_action :set_food, only: %i[create replace]
 
       def index
         line_foods = LineFood.active # active: trueなline_foodの一覧を取得
         # linne_foodsのデータがあるか
         if line_foods.exists?
           render json: {
-            # line_food.idを一つづつ取得
+            # line_food.idを一つづつ取得　map = 配列
             line_food_ids: line_foods.map { |line_food| line_food.id},
             # 最初の店舗情報（一つの仮注文につき一つの店舗仕様のため）　line_foods.first.restaurantでも可
             restaurant: line_foods[0].restaurant,
@@ -33,6 +33,24 @@ module Api
             # 新しく作成しようとした新店舗の情報(new_restaurant)
             new_restaurant: Food.find(params[:food_id]).restaurant.name,
           }, status: :not_acceptable # 他店舗と新店舗の二つの情報がある為406 Not Acceptableを返す(エラー)
+        end
+
+        set_line_food(@ordered_food)
+
+        if @line_food.save
+          render json: {
+            line_food: @line_food
+          }, status: :created
+        else
+          render json: {}, status: :internal_server_error
+        end
+      end
+
+      def replace
+        # 他店舗のline_food一つずつに対して更新
+        LineFood.active.other_restaurant(@ordered_food.restaurant.id).each do |line_food|
+          # active,falseでline_food.activeをfalseにしている
+          line_food.update_attribute(:active, false)
         end
 
         set_line_food(@ordered_food)
