@@ -1,25 +1,50 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from "react-router-dom";
 
+import { Restaurants } from './containers/Restaurants.jsx';
+import { Foods } from './containers/Foods.jsx';
+import { Orders } from './containers/Orders.jsx';
+
+// React Router = <Router>で全体を囲みルーティング先のコンポーネントを<Switch>で囲む, １ページへのルーティングを表すのが<Route>
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          こんばんは
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>
+        {/* 店舗一覧ページ */}
+        {/* exact = PATHの完全一致のみ場合にのみコンポーネントをレンダリング */}
+        <Route
+          exact
+          path="/restaurants">
+          <Restaurants />
+        </Route>
+        {/* フード一覧ページ */}
+        <Route
+          exact
+          path="/foods">
+          <Foods />
+        </Route>
+        {/* 注文ページ */}
+        <Route
+          exact
+          path="/orders">
+          <Orders />
+        </Route>
+        <Route
+          exact
+          path="/restaurants/:restaurantsId/foods" //パラメータとして設定したい部分は:をつける
+          render={({ match }) =>
+            <Foods
+              match={match}
+            />
+          }
+        />
+      </Switch>
+    </Router>
   );
 }
 
