@@ -1,8 +1,15 @@
 // コンポーネント = 任意の入力を受け取り、画面上に表示すべきものを記述するReactを返す
-import React, { Fragment, useEffect } from 'react';
+import React, { Fragment, useReducer, useEffect } from 'react';
 // styled-componentsを使用する
 import styled from 'styled-components';
 import { fetchRestaurants } from '../apis/restaurants';
+
+import {
+  initialState,
+  restaurantsActionTypes,
+  restaurantsReducer,
+} from '../reducers/restaurants';
+
 import MainLogo from '../images/logo.png';
 import MainCoverImage from '../images/main-cover-image.png';
 
@@ -25,12 +32,21 @@ const MainCover = styled.img`
 height: 600px;
 `;
 
+// レンダリング時に一度だけ実行したいので第二引数にから配列[]を入れている
 export const Restaurants = () => {
-  // レンダリング時に一度だけ実行したいので第二引数にから配列[]を入れている
+  // コンポーネントの中で初期化させることでstate,disptch２つの関数を扱うことができる
+  const [state, dispatch] = useReducer(restaurantsReducer, initialState);
+
   useEffect(() => {
+    dispatch({ type: restaurantsActionTypes.FETCHING });
     fetchRestaurants()
       .then((data) =>
-        console.log(data)
+        dispatch({
+          type: restaurantsActionTypes.FETCH_SUCCESS,
+          payload: {
+            restaurants: data.restaurants
+          }
+        })
       )
   }, [])
 
@@ -43,6 +59,15 @@ export const Restaurants = () => {
       <MainCoverImageWrapper>
         <MainCover src={MainCoverImage} alt="main cover" />
       </MainCoverImageWrapper>
+
+      {
+        // mapとすることで配列データを一つずつrestaurantという変数名で参照
+        state.restaurantsList.map(restaurant =>
+          <div key={restaurant.id}>
+            {restaurant.name}
+          </div>
+        )
+      }
     </Fragment>
   )
 }

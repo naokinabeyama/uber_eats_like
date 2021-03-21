@@ -1,6 +1,6 @@
 // APIを叩く関数 axios = promiseベース(非同期の処理の最終的な完了もしくはエラーを表すオブジェクト) 記述がシンプルになる
 import axios from 'axios';
-import { restaurantsIndex } from '../urls/index'
+import { restaurantsIndex } from '../urls/index';
 
 // axios.get成功した場合then、失敗、例外だった場合catchへ
 export const fetchRestaurants = () => {
