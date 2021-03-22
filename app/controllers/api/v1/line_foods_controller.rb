@@ -83,7 +83,7 @@ module Api
         else
           # falseなら新規作成
           @line_food = ordered_food.build_line_food (
-            coount: params[:count],
+            count: params[:count],
             restaurant: ordered_food.restaurant,
             active: true
           )
