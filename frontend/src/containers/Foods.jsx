@@ -1,5 +1,5 @@
 // コンポーネント = 任意の入力を受け取り、画面上に表示すべきものを記述するReactを返す
-import React, { Fragment, useEffect, useReducer } from 'react';
+import React, { Fragment, useEffect, useReducer, useState } from 'react';
 import styled from 'styled-components';
 import { Link } from "react-router-dom";
 import { LocalMallIcon } from '../components/Icons';
@@ -53,6 +53,14 @@ export const Foods = ({
 }) => {
   const [foodsState, dispatch] = useReducer(foodsReducer, foodsInitialState);
 
+  const initialState = {
+    isOpenOrderDialog: false,
+    selectedFood: null,
+    // selectedFoodがいくつ選ばれているか
+    selectedFoodCount: 1,
+  }
+  const [state, setState] = useState(initialState);
+
   useEffect(() => {
     dispatch({ type: foodsActionTypes.FETCHING });
     fetchFoods(match.params.restaurantsId)
@@ -97,7 +105,12 @@ export const Foods = ({
               <ItemWrapper key={food.id}>
                 <FoodWrapper
                   food={food}
-                  onClickFoodWrapper={(food) => console.log(food)}
+                  onClickFoodWrapper={(food) => setState({
+                    ...state,
+                    isOpenOrderDialog: true,
+                    selectedFood: food,
+                  })
+                  }
                   imageUrl={FoodImage}
                 />
               </ItemWrapper>
