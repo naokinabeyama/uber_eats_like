@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { LocalMallIcon } from '../components/Icons';
 import { FoodWrapper } from '../components/FoodWrapper';
 import Skeleton from '@material-ui/lab/Skeleton';
+import { FoodOrderDialog } from '../components/FoodOrderDialog';
 import {
   // initialStateという名前のmoduleをfoodsInitialStateという名前にしてimportしている
   initialState as foodsInitialState,
@@ -105,6 +106,7 @@ export const Foods = ({
               <ItemWrapper key={food.id}>
                 <FoodWrapper
                   food={food}
+                  // フードitemクリック時にsetStateする
                   onClickFoodWrapper={(food) => setState({
                     ...state,
                     isOpenOrderDialog: true,
@@ -117,6 +119,18 @@ export const Foods = ({
             )
         }
       </FoodsList>
+      {
+        // state.isOpenOrderDialogがtrueの場合FoodOrderDialogコンポーネントをレンダリングしてくれる
+        state.isOpenOrderDialog &&
+        <FoodOrderDialog
+          food={state.selectedFood}
+          isOpen={state.isOpenOrderDialog}
+          onClose={() => setState({
+            ...state,
+            isOpenOrderDialog: false,
+          })}
+        />
+      }
     </Fragment>
   )
 }
